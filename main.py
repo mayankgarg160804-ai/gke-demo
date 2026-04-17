@@ -9,7 +9,7 @@ class Handler(BaseHTTPRequestHandler):
         hostname = socket.gethostname()
         body = (
             "Hello from GKE!\n"
-            f"Version: v1\n"
+            f"Version: v2\n"
             f"Hostname: {hostname}\n"
             f"Path: {self.path}\n"
         ).encode("utf-8")
