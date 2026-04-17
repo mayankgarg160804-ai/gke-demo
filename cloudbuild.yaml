@@ -31,3 +31,5 @@ substitutions:
   _IMAGE: demo-app
   _CLUSTER_LOCATION: us-central1
   _CLUSTER: gke-demo-cluster
+options:
+  logging: CLOUD_LOGGING_ONLY
