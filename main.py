@@ -26,4 +26,5 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     server = HTTPServer(("0.0.0.0", PORT), Handler)
     print(f"Listening on port {PORT}")
+    print("Version v2")
     server.serve_forever()
