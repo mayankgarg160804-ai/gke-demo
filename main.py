@@ -29,14 +29,25 @@ HTML_CONTENT = """\
             overflow: hidden;
             border: 1px solid #333;
         }
-        .display {
+        .display-container {
             background-color: #1e1e1e;
-            color: #ffffff;
             text-align: right;
-            padding: 30px 20px 20px;
-            font-size: 3em;
-            word-wrap: break-word;
+            padding: 20px;
             border-bottom: 1px solid #333;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            word-wrap: break-word;
+        }
+        .previous-operand {
+            color: #aaaaaa;
+            font-size: 1.2em;
+            min-height: 1.5em;
+        }
+        .display {
+            color: #ffffff;
+            font-size: 3em;
         }
         .buttons {
             display: grid;
@@ -74,7 +85,10 @@ HTML_CONTENT = """\
 </head>
 <body>
     <div class="calculator">
-        <div class="display" id="display">0</div>
+        <div class="display-container">
+            <div class="previous-operand" id="previous-operand"></div>
+            <div class="display" id="display">0</div>
+        </div>
         <div class="buttons">
             <button onclick="clearDisplay()" class="action">C</button>
             <button onclick="deleteDigit()" class="action">DEL</button>
@@ -99,6 +113,7 @@ HTML_CONTENT = """\
     </div>
     <script>
         let display = document.getElementById('display');
+        let previousOperandElement = document.getElementById('previous-operand');
         let currentInput = '0';
         let previousInput = null;
         let operator = null;
@@ -106,6 +121,15 @@ HTML_CONTENT = """\
 
         function updateDisplay() {
             display.innerText = currentInput;
+            if (operator !== null && previousInput !== null) {
+                let opSymbol = operator;
+                if (operator === '/') opSymbol = '÷';
+                else if (operator === '*') opSymbol = '×';
+                else if (operator === '-') opSymbol = '−';
+                previousOperandElement.innerText = previousInput + ' ' + opSymbol;
+            } else {
+                previousOperandElement.innerText = '';
+            }
         }
 
         function appendNumber(num) {
