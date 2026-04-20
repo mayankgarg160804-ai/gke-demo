@@ -21,6 +21,12 @@ HTML_CONTENT = """\
             margin: 0;
             color: #ffffff;
         }
+        .calculator-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: stretch;
+            height: 520px;
+        }
         .calculator {
             background-color: #1e1e1e;
             border-radius: 12px;
@@ -28,6 +34,8 @@ HTML_CONTENT = """\
             width: 340px;
             overflow: hidden;
             border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
         }
         .display-container {
             background-color: #1e1e1e;
@@ -54,6 +62,7 @@ HTML_CONTENT = """\
             grid-template-columns: repeat(4, 1fr);
             gap: 1px;
             background-color: #333;
+            flex-grow: 1;
         }
         button {
             border: none;
@@ -81,39 +90,105 @@ HTML_CONTENT = """\
         .double {
             grid-column: span 2;
         }
+        .history {
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 250px;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            color: #ffffff;
+        }
+        .history-title {
+            padding: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .clear-history {
+            font-size: 0.8em;
+            color: #aaaaaa;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        .clear-history:hover {
+            color: #ffffff;
+        }
+        .history-list {
+            padding: 10px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .history-item {
+            margin-bottom: 15px;
+            text-align: right;
+            padding-right: 10px;
+        }
+        .history-item .equation {
+            color: #aaaaaa;
+            font-size: 0.9em;
+        }
+        .history-item .result {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .history-item.empty {
+            text-align: center;
+            color: #555;
+            font-style: italic;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <div class="display-container">
-            <div class="previous-operand" id="previous-operand"></div>
-            <div class="display" id="display">0</div>
+    <div class="calculator-wrapper">
+        <div class="calculator">
+            <div class="display-container">
+                <div class="previous-operand" id="previous-operand"></div>
+                <div class="display" id="display">0</div>
+            </div>
+            <div class="buttons">
+                <button onclick="clearDisplay()" class="action">C</button>
+                <button onclick="deleteDigit()" class="action">DEL</button>
+                <button onclick="appendOperator('%')" class="action">%</button>
+                <button onclick="appendOperator('/')" class="operator">&divide;</button>
+                <button onclick="appendNumber('7')">7</button>
+                <button onclick="appendNumber('8')">8</button>
+                <button onclick="appendNumber('9')">9</button>
+                <button onclick="appendOperator('*')" class="operator">&times;</button>
+                <button onclick="appendNumber('4')">4</button>
+                <button onclick="appendNumber('5')">5</button>
+                <button onclick="appendNumber('6')">6</button>
+                <button onclick="appendOperator('-')" class="operator">&minus;</button>
+                <button onclick="appendNumber('1')">1</button>
+                <button onclick="appendNumber('2')">2</button>
+                <button onclick="appendNumber('3')">3</button>
+                <button onclick="appendOperator('+')" class="operator">+</button>
+                <button onclick="appendNumber('0')" class="double">0</button>
+                <button onclick="appendNumber('.')">.</button>
+                <button onclick="calculate()" class="operator">=</button>
+            </div>
         </div>
-        <div class="buttons">
-            <button onclick="clearDisplay()" class="action">C</button>
-            <button onclick="deleteDigit()" class="action">DEL</button>
-            <button onclick="appendOperator('%')" class="action">%</button>
-            <button onclick="appendOperator('/')" class="operator">&divide;</button>
-            <button onclick="appendNumber('7')">7</button>
-            <button onclick="appendNumber('8')">8</button>
-            <button onclick="appendNumber('9')">9</button>
-            <button onclick="appendOperator('*')" class="operator">&times;</button>
-            <button onclick="appendNumber('4')">4</button>
-            <button onclick="appendNumber('5')">5</button>
-            <button onclick="appendNumber('6')">6</button>
-            <button onclick="appendOperator('-')" class="operator">&minus;</button>
-            <button onclick="appendNumber('1')">1</button>
-            <button onclick="appendNumber('2')">2</button>
-            <button onclick="appendNumber('3')">3</button>
-            <button onclick="appendOperator('+')" class="operator">+</button>
-            <button onclick="appendNumber('0')" class="double">0</button>
-            <button onclick="appendNumber('.')">.</button>
-            <button onclick="calculate()" class="operator">=</button>
+        <div class="history">
+            <div class="history-title">
+                History 
+                <span class="clear-history" onclick="clearHistory()">Clear</span>
+            </div>
+            <div class="history-list" id="history-list">
+                <div class="history-item empty" id="empty-history">No history yet</div>
+            </div>
         </div>
     </div>
     <script>
         let display = document.getElementById('display');
         let previousOperandElement = document.getElementById('previous-operand');
+        let historyList = document.getElementById('history-list');
+        let emptyHistory = document.getElementById('empty-history');
+        
         let currentInput = '0';
         let previousInput = null;
         let operator = null;
@@ -134,11 +209,11 @@ HTML_CONTENT = """\
 
         function appendNumber(num) {
             if (currentInput === '0' || shouldResetDisplay) {
-                currentInput = num;
+                currentInput = String(num);
                 shouldResetDisplay = false;
             } else {
                 if (num === '.' && currentInput.includes('.')) return;
-                currentInput += num;
+                currentInput += String(num);
             }
             updateDisplay();
         }
@@ -150,6 +225,7 @@ HTML_CONTENT = """\
             operator = op;
             previousInput = currentInput;
             shouldResetDisplay = true;
+            updateDisplay();
         }
 
         function calculate() {
@@ -164,14 +240,41 @@ HTML_CONTENT = """\
                 case '/': result = b !== 0 ? a / b : 'Error'; break;
                 case '%': result = a % b; break;
             }
+            
+            let opSymbol = operator;
+            if (operator === '/') opSymbol = '÷';
+            else if (operator === '*') opSymbol = '×';
+            else if (operator === '-') opSymbol = '−';
+            
+            let equation = previousInput + ' ' + opSymbol + ' ' + currentInput;
+
             if (result !== 'Error') {
                 result = Math.round(result * 10000000000) / 10000000000;
             }
+            
+            addHistory(equation, String(result));
+
             currentInput = String(result);
             operator = null;
             previousInput = null;
             shouldResetDisplay = true;
             updateDisplay();
+        }
+
+        function addHistory(equation, result) {
+            if (emptyHistory) {
+                emptyHistory.remove();
+                emptyHistory = null;
+            }
+            let div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerHTML = `<div class="equation">${equation} =</div><div class="result">${result}</div>`;
+            historyList.prepend(div);
+        }
+
+        function clearHistory() {
+            historyList.innerHTML = '<div class="history-item empty" id="empty-history">No history yet</div>';
+            emptyHistory = document.getElementById('empty-history');
         }
 
         function clearDisplay() {
@@ -191,6 +294,18 @@ HTML_CONTENT = """\
             }
             updateDisplay();
         }
+
+        // Add keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
+            if (e.key === '.') appendNumber('.');
+            if (e.key === '=' || e.key === 'Enter') { e.preventDefault(); calculate(); }
+            if (e.key === 'Backspace') deleteDigit();
+            if (e.key === 'Escape') clearDisplay();
+            if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/' || e.key === '%') {
+                appendOperator(e.key);
+            }
+        });
     </script>
 </body>
 </html>
