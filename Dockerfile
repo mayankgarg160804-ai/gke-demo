@@ -6,4 +6,4 @@ COPY main.py /app/main.py
 ENV PORT=8080
 EXPOSE 8080
 
-CMD ["python", "/app/main.py"]
+CMD ["python", "-u", "/app/main.py"]
