@@ -71,37 +71,13 @@ HTML_CONTENT = """\
             cursor: pointer;
             background-color: #2b2b2b;
             color: #ffffff;
-            transition: background-color 0.2s, filter 0.2s, transform 0.1s ease;
-            position: relative;
-            overflow: hidden;
+            transition: background-color 0.2s, filter 0.2s;
         }
         button:hover {
-            filter: brightness(1.3);
+            filter: brightness(1.2);
         }
         button:active {
-            filter: brightness(0.85);
-            transform: scale(0.93);
-        }
-        /* Ripple effect */
-        button .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            transform: scale(0);
-            animation: ripple-animation 0.5s ease-out;
-            pointer-events: none;
-        }
-        button.operator .ripple {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        button.action .ripple {
-            background: rgba(255, 255, 255, 0.25);
-        }
-        @keyframes ripple-animation {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
+            filter: brightness(0.8);
         }
         .operator {
             background-color: #f39c12;
@@ -318,21 +294,6 @@ HTML_CONTENT = """\
             }
             updateDisplay();
         }
-
-        // Ripple effect on button click
-        document.querySelectorAll('button').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                const ripple = document.createElement('span');
-                ripple.classList.add('ripple');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-                this.appendChild(ripple);
-                ripple.addEventListener('animationend', () => ripple.remove());
-            });
-        });
 
         // Add keyboard support
         document.addEventListener('keydown', (e) => {
