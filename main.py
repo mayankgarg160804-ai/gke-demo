@@ -131,6 +131,7 @@ HTML_CONTENT = """\
         }
         button:active {
             filter: brightness(0.8);
+            transform: scale(0.92);
         }
         .operator {
             background-color: var(--bg-operator);
@@ -284,6 +285,7 @@ HTML_CONTENT = """\
             }
             operator = op;
             previousInput = currentInput;
+            currentInput = '0';
             shouldResetDisplay = true;
             updateDisplay();
         }
