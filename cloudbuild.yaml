@@ -24,3 +24,5 @@ steps:
         "--location=${_CLUSTER_LOCATION}",
         "--cluster=${_CLUSTER}"
       ]
+options:
+  logging: CLOUD_LOGGING_ONLY
