@@ -1,4 +1,5 @@
 steps:
+  # Step 1: Build image
   - name: gcr.io/cloud-builders/docker
     args:
       [
@@ -8,6 +9,7 @@ steps:
         "."
       ]
 
+  # Step 2: Push image to Artifact Registry
   - name: gcr.io/cloud-builders/docker
     args:
       [
@@ -15,14 +17,24 @@ steps:
         "${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}"
       ]
 
-  - name: gcr.io/cloud-builders/gke-deploy
+  # Step 3: Invoke deploy trigger on success
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
     args:
       [
+        "builds",
+        "triggers",
         "run",
-        "--filename=k8s",
-        "--image=${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}",
-        "--location=${_CLUSTER_LOCATION}",
-        "--cluster=${_CLUSTER}"
+        "${_DEPLOY_TRIGGER_NAME}",
+        "--region=${_LOCATION}",
+        "--substitutions=_IMAGE_TAG=${SHORT_SHA}"
       ]
+
+substitutions:
+  _LOCATION: us-central1
+  _REPOSITORY: gke-demo-repo
+  _IMAGE: demo-app
+  _DEPLOY_TRIGGER_NAME: deploy-trigger
+
 options:
   logging: CLOUD_LOGGING_ONLY
