@@ -24,12 +24,3 @@ steps:
         "--location=${_CLUSTER_LOCATION}",
         "--cluster=${_CLUSTER}"
       ]
-
-substitutions:
-  _LOCATION: us-central1
-  _REPOSITORY: gke-demo-repo
-  _IMAGE: demo-app
-  _CLUSTER_LOCATION: us-central1
-  _CLUSTER: gke-cluster
-options:
-  logging: CLOUD_LOGGING_ONLY
