@@ -1,0 +1,22 @@
+steps:
+  # Step 1: Deploy image to GKE
+  - name: gcr.io/cloud-builders/gke-deploy
+    args:
+      [
+        "run",
+        "--filename=k8s",
+        "--image=${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${_IMAGE_TAG}",
+        "--location=${_CLUSTER_LOCATION}",
+        "--cluster=${_CLUSTER}"
+      ]
+
+substitutions:
+  _LOCATION: us-central1
+  _REPOSITORY: gke-demo-repo
+  _IMAGE: demo-app
+  _CLUSTER_LOCATION: us-central1
+  _CLUSTER: gke-cluster
+  _IMAGE_TAG: ""    # injected automatically by build trigger, do not change
+
+options:
+  logging: CLOUD_LOGGING_ONLY
