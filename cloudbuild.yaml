@@ -17,8 +17,37 @@ steps:
         "${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}"
       ]
 
-  # Step 3: Invoke deploy trigger on success
+  # Step 3: Update tfvars file in GCS bucket
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: update-tfvars
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -e
+
+        IMAGE_PATH="${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}"
+
+        echo "Using image: ${IMAGE_PATH}"
+
+        # Download tfvars file
+        gsutil cp gs://${_TFVARS_BUCKET}/${_TFVARS_FILE} ./terraform.tfvars
+
+        echo "Current tfvars content:"
+        cat terraform.tfvars
+
+        # Replace image value
+        sed -i "s|^image *=.*|image = \"${IMAGE_PATH}\"|g" terraform.tfvars
+
+        echo "Updated tfvars content:"
+        cat terraform.tfvars
+
+        # Upload updated tfvars back to GCS
+        gsutil cp terraform.tfvars gs://${_TFVARS_BUCKET}/${_TFVARS_FILE}
+
+  # Step 4: Invoke deploy trigger
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: invoke-deploy-trigger
     entrypoint: gcloud
     args:
       [
@@ -34,7 +63,13 @@ substitutions:
   _LOCATION: us-central1
   _REPOSITORY: gke-demo-repo
   _IMAGE: demo-app
+
+  # Deploy trigger name
   _DEPLOY_TRIGGER_NAME: deploy-trigger
+
+  # GCS tfvars location
+  _TFVARS_BUCKET: my-tfvars-bucket
+  _TFVARS_FILE: test.tfvars
 
 options:
   logging: CLOUD_LOGGING_ONLY
