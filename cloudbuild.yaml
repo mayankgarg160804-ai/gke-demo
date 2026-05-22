@@ -18,10 +18,10 @@ steps:
       ]
 
   # Step 3: Update tfvars file in GCS bucket
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
-  id: update-tfvars
-  entrypoint: bash
-  args:
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: update-tfvars
+    entrypoint: bash
+    args:
     - -c
     - |
       set -ex
