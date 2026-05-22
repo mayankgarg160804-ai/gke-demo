@@ -18,32 +18,29 @@ steps:
       ]
 
   # Step 3: Update tfvars file in GCS bucket
-  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    id: update-tfvars
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        set -e
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  id: update-tfvars
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      set -ex
 
-        IMAGE_PATH="${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}"
+      IMAGE_PATH="${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}"
 
-        echo "Using image: ${IMAGE_PATH}"
+      echo "Using image: $IMAGE_PATH"
 
-        # Download tfvars file
-        gsutil cp gs://${_TFVARS_BUCKET}/${_TFVARS_FILE} ./terraform.tfvars
+      gsutil cp gs://${_TFVARS_BUCKET}/${_TFVARS_FILE} terraform.tfvars
 
-        echo "Current tfvars content:"
-        cat terraform.tfvars
+      echo "Before update:"
+      cat terraform.tfvars
 
-        # Replace image value
-        sed -i "s|^image *=.*|image = \"$IMAGE_PATH\"|g" terraform.tfvars
+      sed -i "s|^image *=.*|image = \"$IMAGE_PATH\"|g" terraform.tfvars
 
-        echo "Updated tfvars content:"
-        cat terraform.tfvars
+      echo "After update:"
+      cat terraform.tfvars
 
-        # Upload updated tfvars back to GCS
-        gsutil cp terraform.tfvars gs://${_TFVARS_BUCKET}/${_TFVARS_FILE}
+      gsutil cp terraform.tfvars gs://${_TFVARS_BUCKET}/${_TFVARS_FILE}
 
   # Step 4: Invoke deploy trigger
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
