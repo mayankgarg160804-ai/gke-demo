@@ -26,16 +26,12 @@ steps:
     - |
       set -ex
 
-      IMAGE_PATH="${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}"
-
-      echo "Using image: $IMAGE_PATH"
-
       gsutil cp gs://${_TFVARS_BUCKET}/${_TFVARS_FILE} terraform.tfvars
 
       echo "Before update:"
       cat terraform.tfvars
 
-      sed -i "s|^image *=.*|image = \"$IMAGE_PATH\"|g" terraform.tfvars
+      sed -i "s|^image *=.*|image = \"${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}\"|g" terraform.tfvars
 
       echo "After update:"
       cat terraform.tfvars
