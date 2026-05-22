@@ -37,7 +37,7 @@ steps:
         cat terraform.tfvars
 
         # Replace image value
-        sed -i "s|^image *=.*|image = \"${IMAGE_PATH}\"|g" terraform.tfvars
+        sed -i "s|^image *=.*|image = \"$${IMAGE_PATH}\"|g" terraform.tfvars
 
         echo "Updated tfvars content:"
         cat terraform.tfvars
